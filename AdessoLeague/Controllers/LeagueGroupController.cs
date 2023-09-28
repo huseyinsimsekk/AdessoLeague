@@ -19,26 +19,33 @@ namespace AdessoLeague.Controllers
             _mainContext = mainContext;
         }
 
-        [HttpGet(Name = "GetGroups/{groupCount}/{creatorId}")]
-        public ActionResult Get(int groupCount, int creatorId)
+        [HttpPost]
+        public ActionResult CreateGroups([FromBody] GroupCreateRequestModel model)
         {
-            GroupCreatorContext groupCreaterContext = null;
-
-            switch (groupCount)
+            if (!ModelState.IsValid)
             {
-                case 4:
-                    groupCreaterContext = new GroupCreatorContext(_mainContext, new FourGroupCreator(_configuration));
-                    break;
-                case 8:
-                    groupCreaterContext = new GroupCreatorContext(_mainContext, new EigthGroupCreator(_configuration));
-                    break;
-                default:
-                    return BadRequest("4 veya 8 Grup Oluşturabilirsiniz!");
+                var message = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+
+                return BadRequest($"Girelen Bilgiler Hatalı. Detay: {message}");
             }
+
             try
             {
-                return Ok(groupCreaterContext.CreateGroups(creatorId));
+                GroupCreatorContext groupCreaterContext = null;
+                switch (model.GroupCount)
+                {
+                    case 4:
+                        groupCreaterContext = new GroupCreatorContext(_mainContext, new FourGroupCreator(_configuration));
+                        break;
+                    case 8:
+                        groupCreaterContext = new GroupCreatorContext(_mainContext, new EigthGroupCreator(_configuration));
+                        break;
+                    default:
+                        break;
+                }
+                return Ok(groupCreaterContext.CreateGroups(model.CreatorId));
             }
+
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
