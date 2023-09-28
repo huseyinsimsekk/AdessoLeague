@@ -20,27 +20,34 @@ namespace AdessoLeague.Business.Service
         }
         public List<GroupResponseModel> CreateGroups(int creatorId)
         {
-            var list = _groupCreator.CreateGroup();
-            var hash = DateTime.Now + "_" + creatorId.ToString();
-
-            for (int i = 0; i < list.Count; i++)
+            try
             {
-                foreach (var team in list[i].Teams)
+                var list = _groupCreator.CreateGroup();
+                var hash = DateTime.Now + "_" + creatorId.ToString();
+
+                for (int i = 0; i < list.Count; i++)
                 {
-                    _mainContext.GroupTeams.Add(new GroupTeam
+                    foreach (var team in list[i].Teams)
                     {
-                        CreateTime = DateTime.Now.Date,
-                        Hash = hash,
-                        CreatorId = creatorId,
-                        GroupName = list[i].GroupName,
-                        TeamId = team.Id
-                    });
+                        _mainContext.GroupTeams.Add(new GroupTeam
+                        {
+                            CreateTime = DateTime.Now.Date,
+                            Hash = hash,
+                            CreatorId = creatorId,
+                            GroupName = list[i].GroupName,
+                            TeamId = team.Id
+                        });
+                    }
                 }
+                _mainContext.SaveChanges();
+                return list;
+
             }
-            _mainContext.SaveChanges();
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Gruplar Oluşturulurken Hata Alındı. Detay: {ex.Message}");
+            }
 
-
-            return list;
         }
     }
 }

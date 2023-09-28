@@ -17,6 +17,11 @@ namespace AdessoLeague.Business.Service
             var response = new List<GroupResponseModel>();
             var allTeams = _configuration.GetSection("Teams").Get<List<Team>>();
             var countries = _configuration.GetSection("Countries").Get<List<Country>>();
+
+            if (allTeams is null || countries is null)
+            {
+                throw new ApplicationException("Bilgilere Ulaşılamadı!");
+            }
             var random = new Random();
             var selectedCountries = countries?.OrderBy(m => random.Next(countries.Count)).Take(4).ToList();
             var count = 0;

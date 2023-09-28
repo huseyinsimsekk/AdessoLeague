@@ -35,8 +35,14 @@ namespace AdessoLeague.Controllers
                 default:
                     return BadRequest("4 veya 8 Grup Oluşturabilirsiniz!");
             }
-
-            return Ok(groupCreaterContext.CreateGroups(creatorId));
+            try
+            {
+                return Ok(groupCreaterContext.CreateGroups(creatorId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

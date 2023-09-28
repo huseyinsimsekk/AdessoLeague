@@ -13,7 +13,10 @@ namespace AdessoLeague.Business.Service
         public List<GroupResponseModel> CreateGroup()
         {
             var teams = _configuration.GetSection("Teams").Get<List<Team>>();
-            
+            if (teams is null)
+            {
+                throw new ApplicationException("Bilgilere Ulaşılamadı!");
+            }
             return GroupService.GroupResponseModelsByCountries(teams); ;
         }
     }
